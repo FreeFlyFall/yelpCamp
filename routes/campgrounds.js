@@ -2,6 +2,30 @@ var express = require("express");
 var router = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
+//IMAGE UPLOAD CONFIGURATION
+var multer = require('multer');
+var storage = multer.diskStorage({
+  filename: function(req, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  }
+});
+var imageFilter = function (req, file, cb) {
+    // accept image files only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        return cb(new Error('Only jpg|jpeg|png|gif file types are allowed!'), false);
+    }
+    cb(null, true);
+};
+var upload = multer({ storage: storage, fileFilter: imageFilter})
+
+var cloudinary = require('cloudinary');
+cloudinary.config({ 
+  cloud_name: 'ddjq2ybhp', 
+  api_key: '847744797933742', 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// GOOGLE MAPS CONFIGURATION
 // var NodeGeocoder = require('node-geocoder');
  
 // var options = {
@@ -15,20 +39,36 @@ var middleware = require("../middleware");
 
 //INDEX - show all campgrounds
 router.get("/", function(req, res){
-    // Get all campgrounds from DB
-    Campground.find({}, function(err, allCampgrounds){
-        if(err){
-            console.log(err);
-        } else {
-           res.render("campgrounds/index",{campgrounds: allCampgrounds, page: 'campgrounds'});
-        }
-    });
+    if(req.query.search) {
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        Campground.find({name: regex}, (err, searchResults) => {
+            if(err){
+                console.log(err);
+            } else {
+                if(searchResults.length < 1){
+                    req.flash('error', 'No campgrounds match. Please try again.');
+                    return res.redirect('/campgrounds');
+                }
+                res.render("campgrounds/index", {campgrounds: searchResults, page: 'campgrounds'});
+            }
+        });
+    } else {
+        // Get all campgrounds from DB
+        Campground.find({}, function(err, allCampgrounds){
+            if(err){
+                console.log(err);
+            } else {
+               res.render("campgrounds/index", {campgrounds: allCampgrounds, page: 'campgrounds'});
+            }
+        });
+    }
 });
 
 //CREATE - add new campground to DB
 router.post("/", middleware.isLoggedIn, function(req, res){
   // get data from form and add to campgrounds array
   var name = req.body.name;
+  var price = req.body.price;
   var image = req.body.image;
   var desc = req.body.description;
   var author = {
@@ -43,7 +83,7 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 //     var lat = data[0].latitude;
 //     var lng = data[0].longitude;
 //     var location = data[0].formattedAddress;
-    var newCampground = {name: name, image: image, description: desc, author:author};
+    var newCampground = {name: name, price: price, image: image, description: desc, author:author};
     // , location: location, lat: lat, lng: lng
     
     // Create a new campground and save to DB
@@ -57,7 +97,8 @@ router.post("/", middleware.isLoggedIn, function(req, res){
         }
     });
   });
-// });
+// }); 
+
 
 //NEW - show form to create new campground
 router.get("/new", middleware.isLoggedIn, function(req, res){
@@ -120,5 +161,10 @@ router.delete("/:id", middleware.checkCampgroundOwnership, function(req, res){
         }
        })
 });
+
+// FUZZY SEARCH FUNCTION
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
 
 module.exports = router;
