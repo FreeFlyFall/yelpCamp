@@ -1,4 +1,4 @@
-// require("dotenv").config();
+require("dotenv").config();
 
 var express = require("express"),
     app = express(),
@@ -25,7 +25,7 @@ app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.use(flash());
 
-// //delete & seed data to DB
+// //delete & seed test data to DB
 // seedDB();
 
 app.locals.moment = require("moment"),

@@ -1,38 +1,31 @@
 <% include ./partials/header %>
 
 <div class="row">
-    <h1 style="text-align: center">Sign Up</h1>
-    <div style="width: 30%; margin: 25px auto;">
-        <form action="/register" method="post">
-            <div class="form-group">
-                <input class="form-control" type="text" name="username" placeholder="username" autofocus required>
-            </div>
-            <div class="form-group">
-                <input class="form-control" type="password" name="password" placeholder="password" required>
-            </div>
+    <div class="col-md-12">
+        <form class="form-signin" action="/register" method="post">
+            <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
             
+            <label for="inputUsername" class="sr-only">Username</label>
+                <input class="form-control" id="inputUsername" type="text" name="username" placeholder="Username" autofocus required>
+            <label for="inputPassword" class="sr-only">Password</label>
+                <input class="form-control" id="inputPassword" type="password" name="password" placeholder="password" required>
             
+            <label for="inputFirstName" class="sr-only">First Name</label>
+                <input class="form-control" id="inputFirstName" type="text" name="firstName" placeholder="First Name" required>
+            <label for="inputLastName" class="sr-only">Last Name</label>
+                <input class="form-control" id="inputLastName" type="text" name="lastName" placeholder="Last Name" required>
+            <label for="inputEmail" class="sr-only">Email</label>
+                <input class="form-control" id="inputEmail" type="email" name="email" placeholder="Email" required>
+            <label for="inputAvatarUrl" class="sr-only">Avatar Url</label>
+                <input class="form-control" id="inputAvatarUrl" type="text" name="avatar" placeholder="Avatar Url">
+            <label for="inputAdminCode" class="sr-only">Admin Code</label>
+                <input class="form-control" id="inputAdminCode" type="text" name="adminCode" placeholder="Do I feel Lucky? Well, do ya, punk?">
             <div class="form-group">
-                <input class="form-control" type="text" name="firstName" placeholder="first name" required>
-            </div>
-            <div class="form-group">
-                <input class="form-control" type="text" name="lastName" placeholder="last name" required>
-            </div>
-            <div class="form-group">
-                <input class="form-control" type="email" name="email" placeholder="user@esp.com" required>
-            </div>
-            <div class="form-group">
-                <input class="form-control" type="text" name="avatar" placeholder="avatar url">
-            </div>
-            
-            
-                <input class="form-control" type="text" name="adminCode" placeholder="Do you feel lucky? Well.. do ya, punk?">
-            </div>
-            <div class="form-group">
-                <button class="btn btn-lg btn-primary btn-block">Sign Up!</button>
-            </div>
+                <button class="btn btn-lg btn-primary btn-block">Sign Up</button>
         </form>
-        <a href="/campgrounds">Go Back</a>
+        <div class="form-signin">
+            <a href="/campgrounds">Go Back</a>
+        </div>
     </div>
 </div>
 

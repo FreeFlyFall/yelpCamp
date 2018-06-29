@@ -39,27 +39,47 @@ cloudinary.config({
 
 //INDEX - show all campgrounds
 router.get("/", function(req, res){
+    var perPage = 8;
+    var pageQuery = parseInt(req.query.page);
+    var pageNumber = pageQuery ? pageQuery : 1;
+    var noMatch = null;
     if(req.query.search) {
         const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-        Campground.find({name: regex}, (err, searchResults) => {
-            if(err){
-                console.log(err);
-            } else {
-                if(searchResults.length < 1){
-                    req.flash('error', 'No campgrounds match. Please try again.');
-                    return res.redirect('/campgrounds');
+        Campground.find({name: regex}).skip((perPage * pageNumber) - perPage).limit(perPage).exec(function (err, allCampgrounds) {
+            Campground.count({name: regex}).exec(function (err, count) {
+                if (err) {
+                    console.log(err);
+                    res.redirect("back");
+                } else {
+                    if(allCampgrounds.length < 1) {
+                        noMatch = "No campgrounds match that query, please try again.";
+                    }
+                    res.render("campgrounds/index", {
+                        campgrounds: allCampgrounds,
+                        current: pageNumber,
+                        pages: Math.ceil(count / perPage),
+                        noMatch: noMatch,
+                        search: req.query.search
+                    });
                 }
-                res.render("campgrounds/index", {campgrounds: searchResults, page: 'campgrounds'});
-            }
+            });
         });
     } else {
-        // Get all campgrounds from DB
-        Campground.find({}, function(err, allCampgrounds){
-            if(err){
-                console.log(err);
-            } else {
-               res.render("campgrounds/index", {campgrounds: allCampgrounds, page: 'campgrounds'});
-            }
+        // get all campgrounds from DB
+        Campground.find({}).skip((perPage * pageNumber) - perPage).limit(perPage).exec(function (err, allCampgrounds) {
+            Campground.count().exec(function (err, count) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.render("campgrounds/index", {
+                        campgrounds: allCampgrounds,
+                        current: pageNumber,
+                        pages: Math.ceil(count / perPage),
+                        noMatch: noMatch,
+                        search: false
+                    });
+                }
+            });
         });
     }
 });
