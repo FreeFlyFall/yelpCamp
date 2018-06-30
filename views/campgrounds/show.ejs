@@ -56,7 +56,7 @@
                 <!--If the user is logged in, show the new comment form-->
                 <div class="card-header card-body">
                     <h4>Write your comment <span class="fas fa-pen" aria-hidden="true"></span></h4>
-                    <form id="add-comment-form" action="/campgrounds/<%= campground._id %>/comments#last" method="POST">
+                    <form id="add-comment-form" action="/campgrounds/<%= campground._id %>/comments" method="POST">
                       <div class="form-group">
                         <input class="form-control" type="text" disabled value="<%= currentUser.username %>">
                       </div>
@@ -86,60 +86,61 @@
             <!--Display comments by looping through them-->
             <div class="card-body">
               <% campground.comments.forEach(function(comment) { %>
-              <div class="row">
-                <div class="col-md-12">
-                  <strong>
-                      <% if (currentUser && currentUser._id.equals(comment.author.id)) { %>
-                    <!--If the current user owns the comment, change the color of the user icon-->
-                    <span style="color: orange;" class="fas fa-user-alt" aria-hidden="true"></span>
-                      <% } else { %>
-                    <!--Else just display it black-->
-                    <span class="fas fa-user-alt" aria-hidden="true"></span>
-                      <% } %>
-                    <!--Print out the author username-->
-                      <div style="display: inline;"></div><%= comment.author.username %>
-                  </strong>
-                  <!--Show when the comment was made-->
-                  <span class="float-right"><small class="text-muted"><%= moment(comment.createdAt).fromNow() %></small></span>
-                  <!--Printing the comment-->
-                  <p><%= comment.text %></p>
-                  <!--If the visitor is logged in and the owner of the comment, show the edit and delete buttons-->
-                    <% if (currentUser && currentUser._id.equals(comment.author.id || currentuser && currentUser.isAdmin) || currentUser && currentUser.isAdmin) { %>
-                  <!--Edit button used for collapsing the edit comment form-->
-                  <a class="btn btn-xs btn-warning" role="button" data-toggle="collapse" href="#collapseEdit<%= comment._id %>" aria-expanded="false" aria-controls="collapse<%= comment._id %>">
-                    Edit</a>
-                  <!--Delete comment button-->
-                  <form id="delete-form" action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST" style="display: inline;">
-                    <button class="btn btn-xs btn-danger">Delete</button>
-                  </form>
-                  <!--Edit comment form-->
-                  <div class="collapse" id="collapseEdit<%= comment._id %>">
-                    <div class="card border-warning" style="border-left: 5px solid; margin-top: 15px;">
-                      <div class="card-header card-body">
-                        <h4>Edit your comment <span class="fas fa-edit" aria-hidden="true"></span></h4>
-                        <form id="edit-comment-form<%= comment._id %>" action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=PUT" method="POST">
-                        <div class="form-group">
-                          <input class="form-control" type="text" disabled value="<%= currentUser.username %>">
+              <div id="<%= comment._id %>">
+                <div class="row">
+                  <div class="col-md-12">
+                    <strong>
+                        <% if (currentUser && currentUser._id.equals(comment.author.id)) { %>
+                      <!--If the current user owns the comment, change the color of the user icon-->
+                      <span style="color: orange;" class="fas fa-user-alt" aria-hidden="true"></span>
+                        <% } else { %>
+                      <!--Else just display it black-->
+                      <span class="fas fa-user-alt" aria-hidden="true"></span>
+                        <% } %>
+                      <!--Print out the author username-->
+                        <div style="display: inline;"></div><%= comment.author.username %>
+                    </strong>
+                    <!--Show when the comment was made-->
+                    <span class="float-right"><small class="text-muted"><%= moment(comment.createdAt).fromNow() %></small></span>
+                    <!--Printing the comment-->
+                    <p><%= comment.text %></p>
+                    <!--If the visitor is logged in and the owner of the comment, show the edit and delete buttons-->
+                      <% if (currentUser && currentUser._id.equals(comment.author.id || currentuser && currentUser.isAdmin) || currentUser && currentUser.isAdmin) { %>
+                    <!--Edit button used for collapsing the edit comment form-->
+                    <a class="btn btn-xs btn-warning" role="button" data-toggle="collapse" href="#collapseEdit<%= comment._id %>" aria-expanded="false" aria-controls="collapse<%= comment._id %>">
+                      Edit</a>
+                    <!--Delete comment button-->
+                    <form id="delete-form" action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST" style="display: inline;">
+                      <button class="btn btn-xs btn-danger">Delete</button>
+                    </form>
+                    <!--Edit comment form-->
+                    <div class="collapse" id="collapseEdit<%= comment._id %>">
+                      <div class="card border-warning" style="border-left: 5px solid; margin-top: 15px;">
+                        <div class="card-header card-body">
+                          <h4>Edit your comment <span class="fas fa-edit" aria-hidden="true"></span></h4>
+                          <form id="edit-comment-form<%= comment._id %>" action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=PUT#<%= comment._id %>" method="POST">
+                          <div class="form-group">
+                            <input class="form-control" type="text" disabled value="<%= currentUser.username %>">
+                          </div>
+                          <div class="form-group">
+                            <textarea class="form-control" name="comment[text]" placeholder="Your comment text..." form="edit-comment-form<%= comment._id %>" rows="5" cols="70"><%= comment.text %></textarea>
+                          </div>
+                          <div class="form-group">
+                            <button class="btn btn-warning btn-sm">Edit comment <span class="fas fa-edit" aria-hidden="true"></span></button>
                         </div>
-                        <div class="form-group">
-                          <textarea class="form-control" name="comment[text]" placeholder="Your comment text..." form="edit-comment-form<%= comment._id %>" rows="5" cols="70"><%= comment.text %></textarea>
-                        </div>
-                        <div class="form-group">
-                          <button class="btn btn-warning btn-sm">Edit comment <span class="fas fa-edit" aria-hidden="true"></span></button>
+                        
+  
+                          </div>
+                        </form>
                       </div>
-                      
-
-                        </div>
-                      </form>
                     </div>
+                      <% } %>
+                    <hr>
                   </div>
-                    <% } %>
-                  <hr>
                 </div>
               </div>
                 <% }) %>
             </div>
-          <div id="last"></div>
           </div>
           <!--COMMENT SECTION END-->
 
